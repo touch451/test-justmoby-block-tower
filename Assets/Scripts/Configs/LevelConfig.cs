@@ -7,8 +7,5 @@ public class LevelConfig : ScriptableObject
     [Header("Used Blocks:")]
     [SerializeField] private List<BlockColor> blocks = new List<BlockColor>();
 
-    public List<BlockColor> GetBlocks()
-    {
-        return blocks;
-    }
+    public List<BlockColor> Blocks => blocks;
 }

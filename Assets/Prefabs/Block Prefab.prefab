@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 4577196362633025575}
+  collider: {fileID: 3686301682498074613}
 --- !u!1 &8113959427843906793
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,7 +58,6 @@ GameObject:
   - component: {fileID: 63207316840592299}
   - component: {fileID: 4577196362633025575}
   - component: {fileID: 3686301682498074613}
-  - component: {fileID: 4325465923600674292}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -177,30 +177,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 180, y: 180}
   m_EdgeRadius: 0
---- !u!50 &4325465923600674292
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8113959427843906793}
-  m_BodyType: 0
-  m_Simulated: 0
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4

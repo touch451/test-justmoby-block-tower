@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public static class AddressablesUtils
+public static class AddressablesTools
 {
     public static IEnumerator CheckAddressableAssetDownloaded_Co(string addressableKey, Action<bool> onComplete)
     {
