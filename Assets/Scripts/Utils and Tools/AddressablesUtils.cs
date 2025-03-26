@@ -15,7 +15,7 @@ public static class AddressablesUtils
             onComplete?.Invoke(getDownloadSize.Result > 0);
     }
 
-    public static IEnumerator LoadAddressableAsset_Co<T>(string key, Action<AsyncOperationHandle<T>> onSuccess = null, Action onFailed = null, Action<float> onUpdate = null)
+    public static IEnumerator LoadAddressableAsset_Co<T>(string key, Action<AsyncOperationHandle<T>> onLoaded = null, Action onFailed = null, Action<float> onUpdate = null)
     {
         AsyncOperationHandle<T> opHandle;
         opHandle = Addressables.LoadAssetAsync<T>(key);
@@ -28,7 +28,7 @@ public static class AddressablesUtils
         }
 
         if (opHandle.Status == AsyncOperationStatus.Succeeded)
-            onSuccess?.Invoke(opHandle);
+            onLoaded?.Invoke(opHandle);
         else
             onFailed?.Invoke();
     }
