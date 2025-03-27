@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public EventsSystem events = new EventsSystem();
+    public LevelConfig LevelConfig => levelConfig;
 
     private void Awake()
     {
@@ -16,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        scrollPanel.SetBlocks(levelConfig.Blocks);
+        scrollPanel.SetBlocks(levelConfig.Colors);
     }
 
     private void OnDestroy()

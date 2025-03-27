@@ -2,11 +2,11 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class InputController : MonoBehaviour
+public class DragController : MonoBehaviour
 {
     [SerializeField] private ScrollPanel scrollPanel;
 
-    private Vector2 draggOffset = Vector2.zero;
+    private Vector2 touchOffset = Vector2.zero;
     private Block draggedBlock = null;
 
     private void Start()
@@ -47,7 +47,7 @@ public class InputController : MonoBehaviour
             {
                 Vector3 touchWorldPos = eventData.pointerCurrentRaycast.worldPosition;
                 Vector3 blockWorldPos = draggedBlock.transform.position;
-                draggOffset = blockWorldPos - touchWorldPos;
+                touchOffset = blockWorldPos - touchWorldPos;
             }
         }
     }
@@ -60,22 +60,36 @@ public class InputController : MonoBehaviour
         Vector3 touchWorldPos = eventData.pointerCurrentRaycast.worldPosition;
         Vector3 blockWorldPos = draggedBlock.transform.position;
 
-        float x = draggedBlock.inScroll ? blockWorldPos.x : touchWorldPos.x + draggOffset.x;
+        // Если блок в скролл панеле, то двигаем его только по вертикали
+        float x = draggedBlock.inScroll ? blockWorldPos.x : touchWorldPos.x + touchOffset.x;
 
         Vector3 targetPosition =
-            new Vector3(x, touchWorldPos.y + draggOffset.y, blockWorldPos.z);
+            new Vector3(x, touchWorldPos.y + touchOffset.y, blockWorldPos.z);
 
         draggedBlock.transform.position = targetPosition;
 
+        // Если блок находился в скролл панеле и его вытянули выше верхней границы панели
         if (draggedBlock.inScroll && targetPosition.y > scrollPanel.WorldBounds.max.y)
-            draggedBlock.OnPullOutFromScroll();
+            draggedBlock.OnDragOutFromScroll();
     }
 
     private void OnBlockEndDrag(PointerEventData eventData)
     {
         if (draggedBlock.inScroll)
-            draggedBlock.ReturnToCenterCell();
-
+        {
+            // Если блок отпустили не вытащив из скролл панели, то возвращаем его на свое место
+            draggedBlock.ReturnToCell();
+        }
+        else
+        {
+            // Если блок отпустили на поле, то он начинает падение.
+            // Блок уничтожится, когда достигнет Y позиции немного выше скролл панели =
+            // верхняя граница скролл панели + еще 25% от ее высоты.
+            float scrollSizeY = scrollPanel.WorldBounds.size.y;
+            float yPositionToDestroyBlock = scrollPanel.WorldBounds.max.y + scrollSizeY * 0.25f;
+            draggedBlock.DoFall(yPositionToDestroyBlock);
+        }
+            
         draggedBlock = null;
     }
 }

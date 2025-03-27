@@ -465,6 +465,7 @@ GameObject:
   - component: {fileID: 628239569}
   - component: {fileID: 628239571}
   - component: {fileID: 628239572}
+  - component: {fileID: 628239573}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -523,10 +524,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 628239568}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02b949801b20540c4b028e38de2c6219, type: 3}
+  m_Script: {fileID: 11500000, guid: 46f227bfaab6d4bd498e10bcb6d86bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   scrollPanel: {fileID: 1068572811}
+--- !u!114 &628239573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628239568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49bf1dc98796f45cabf73c1dd46f1980, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  splashPrefab: {fileID: 4637956419228784921, guid: 5076a82d5e5664f4fbcee41dad1857a5, type: 3}
 --- !u!1 &1068572807
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,11 +8,11 @@ public class ScrollPanel : MonoBehaviour
     [SerializeField] private BlockCell cellPrefab;
     [SerializeField] private ScrollRect scroll;
 
-    private List<BlockCell> _cells = new List<BlockCell>();
-    private Bounds _worldBounds = new Bounds();
+    private List<BlockCell> cells = new List<BlockCell>();
+    private Bounds worldBounds = new Bounds();
 
+    public Bounds WorldBounds => worldBounds;
     public ScrollRect Scroll => scroll;
-    public Bounds WorldBounds => _worldBounds;
 
     private void Start()
     {
@@ -21,7 +21,7 @@ public class ScrollPanel : MonoBehaviour
 
     private void CalculateWorldBounds()
     {
-        _worldBounds.SetMinMax(
+        worldBounds.SetMinMax(
             ScriptTools.GetRectWorldOffsetMin(rect),
             ScriptTools.GetRectWorldOffsetMax(rect));
     }
@@ -34,7 +34,7 @@ public class ScrollPanel : MonoBehaviour
             var cell = Instantiate(cellPrefab, scroll.content);
 
             cell.SetBlock(blockColor);
-            _cells.Add(cell);
+            cells.Add(cell);
         }
     }
 }

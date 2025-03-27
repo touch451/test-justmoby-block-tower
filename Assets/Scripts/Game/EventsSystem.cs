@@ -8,7 +8,9 @@ public class EventsSystem
     public UnityEvent<PointerEventData> onBlockBeginDrag = new UnityEvent<PointerEventData>();
     public UnityEvent<PointerEventData> onBlockEndDrag = new UnityEvent<PointerEventData>();
     public UnityEvent<PointerEventData> onBlockDrag = new UnityEvent<PointerEventData>();
-    public UnityEvent<Block> onBlockPullOutFromScroll = new UnityEvent<Block>();
+
+    public UnityEvent<Block> onBlockDragOutFromScroll = new UnityEvent<Block>();
+    public UnityEvent<Block> onBlockDestroyed = new UnityEvent<Block>();
 
     #endregion
 
@@ -17,6 +19,8 @@ public class EventsSystem
         onBlockBeginDrag.RemoveAllListeners();
         onBlockEndDrag.RemoveAllListeners();
         onBlockDrag.RemoveAllListeners();
-        onBlockPullOutFromScroll.RemoveAllListeners();
+
+        onBlockDragOutFromScroll.RemoveAllListeners();
+        onBlockDestroyed.RemoveAllListeners();
     }
 }

@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1021ada92152e466ea187a9121ef27a6, type: 3}
   m_Name: Level Config 1
   m_EditorClassIdentifier: 
+  fallSpeed: 5
+  colors: 0100000003000000040000000700000008000000090000000b0000000d0000000e000000100000001300000014000000

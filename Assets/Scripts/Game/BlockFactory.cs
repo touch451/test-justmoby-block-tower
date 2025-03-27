@@ -23,17 +23,24 @@ public class BlockFactory : MonoBehaviour
         }
     }
 
-    public Block InstantiateBlock(BlockColor color)
+    public Block InstantiateBlock(BlockColor color, Transform parent = null)
     {
-        Block block = Instantiate(blockPrefab);
-        block.SetColor(color);
+        Block block = Instantiate(blockPrefab, parent);
+        block.Init(color, 0f, false);
         return block;
     }
 
-    public Block InstantiateBlock(BlockColor color, Transform parent)
+    public Block InstantiateBlock(BlockColor color, float fallSpeed, Transform parent = null)
     {
         Block block = Instantiate(blockPrefab, parent);
-        block.SetColor(color);
+        block.Init(color, fallSpeed, false);
+        return block;
+    }
+
+    public Block InstantiateBlock(BlockColor color, float fallSpeed, bool inScroll, Transform parent = null)
+    {
+        Block block = Instantiate(blockPrefab, parent);
+        block.Init(color, fallSpeed, inScroll);
         return block;
     }
 }
