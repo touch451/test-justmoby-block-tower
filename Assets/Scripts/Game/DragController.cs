@@ -56,17 +56,24 @@ public class DragController : MonoBehaviour
 
         Vector3 touchWorldPos = eventData.pointerCurrentRaycast.worldPosition;
         Vector3 blockWorldPos = draggedBlock.transform.position;
+        Transform blockTr = draggedBlock.transform;
 
         // Если блок в скролл панеле, то двигаем его только по вертикали
-        float x = draggedBlock.inScroll ? blockWorldPos.x : touchWorldPos.x + touchOffset.x;
+        float x = draggedBlock.inScroll
+            ? blockWorldPos.x
+            : touchWorldPos.x + touchOffset.x;
 
         Vector3 targetPosition =
             new Vector3(x, touchWorldPos.y + touchOffset.y, blockWorldPos.z);
 
-        draggedBlock.transform.position = targetPosition;
+        blockTr.position = targetPosition;
+
+        // Нельзя двигать блок вниз, когда он в скролл панеле
+        if (draggedBlock.inScroll && blockTr.localPosition.y < 0)
+            blockTr.localPosition = Vector3.zero;
 
         // Если блок находился в скролл панеле и его вытянули выше верхней границы панели
-        if (draggedBlock.inScroll && targetPosition.y > scrollPanel.WorldBounds.max.y)
+        if (draggedBlock.inScroll && blockTr.position.y > scrollPanel.WorldBounds.max.y)
             draggedBlock.OnDragOutFromScroll();
     }
 
@@ -77,8 +84,13 @@ public class DragController : MonoBehaviour
 
         if (draggedBlock.inScroll)
         {
-            // Если блок отпустили не вытащив из скролл панели, то возвращаем его на свое место
+            // Если блок отпустили не вытащив из скролл панели, то возвращаем его на свое место.
             draggedBlock.ReturnToCell();
+        }
+        else if (draggedBlock.bounds.min.y <= scrollPanel.WorldBounds.max.y)
+        {
+            // Если блок отпустили над скролл панелью - сразу уничтожаем его.
+            draggedBlock.DestroyBlock();
         }
         else
         {
