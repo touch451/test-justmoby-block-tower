@@ -5,10 +5,10 @@ using UnityEngine.UI;
 public class ScrollPanel : MonoBehaviour
 {
     [SerializeField] private RectTransform rect;
-    [SerializeField] private BlockCell cellPrefab;
+    [SerializeField] private ScrollCell cellPrefab;
     [SerializeField] private ScrollRect scroll;
 
-    private List<BlockCell> cells = new List<BlockCell>();
+    private List<ScrollCell> cells = new List<ScrollCell>();
     private Bounds worldBounds = new Bounds();
 
     public Bounds WorldBounds => worldBounds;
@@ -33,6 +33,7 @@ public class ScrollPanel : MonoBehaviour
             var blockColor = colors[i];
             var cell = Instantiate(cellPrefab, scroll.content);
 
+            cell.name += "_" + i; 
             cell.SetBlock(blockColor);
             cells.Add(cell);
         }

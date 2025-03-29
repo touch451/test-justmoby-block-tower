@@ -4,7 +4,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Level Config", menuName = "Configs/Level Config")]
 public class LevelConfig : ScriptableObject
 {
-    [Header("Fall speed:")]
     [SerializeField] [Range(1.0f, 20.0f)] private float fallSpeed = 10f;
 
     [Header("Used colors:")]

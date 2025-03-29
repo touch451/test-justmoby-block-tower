@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8469228341186738888}
   - component: {fileID: 8207119527458817603}
   m_Layer: 5
-  m_Name: Block Cell Prefab
+  m_Name: Scroll Cell Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

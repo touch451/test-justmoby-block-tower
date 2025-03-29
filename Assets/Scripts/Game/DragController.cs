@@ -7,7 +7,7 @@ public class DragController : MonoBehaviour
     [SerializeField] private ScrollPanel scrollPanel;
 
     private Vector2 touchOffset = Vector2.zero;
-    private Block draggedBlock = null;
+    private Cube draggedBlock = null;
 
     private void Start()
     {
@@ -21,33 +21,30 @@ public class DragController : MonoBehaviour
         GameManager.Instance.events.onBlockDrag.AddListener(OnBlockDrag);
     }
 
-    private void OnBlockBeginDrag(PointerEventData eventData)
+    private void OnBlockBeginDrag(Cube block, PointerEventData eventData)
     {
         if (draggedBlock != null)
-            Destroy(draggedBlock);
-
-        if (!eventData.pointerDrag.TryGetComponent<Block>(out draggedBlock))
             return;
+
+        draggedBlock = block;
+
+        Vector3 touchWorldPos = eventData.pointerCurrentRaycast.worldPosition;
+        Vector3 blockWorldPos = draggedBlock.transform.position;
+        touchOffset = blockWorldPos - touchWorldPos;
 
         if (draggedBlock.inScroll)
         {
             bool isDragByHorizontal = Math.Abs(eventData.delta.x) > Math.Abs(eventData.delta.y);
 
-            // Если перетаскиваемый блок находится в скролл панеле и его тащут по горизонтали
+            // Если перетаскиваемый блок находится в скролл панеле и его тащут по горизонтали,
             if (isDragByHorizontal)
             {
-                // то заменяем объект в eventData на скролл нижней панели, чтобы двигать скролл, а не блок.
+                // то заменяем ссылку на объект в eventData на скролл, чтобы начать двигать скролл, а не блок.
                 var scrollGO = scrollPanel.Scroll.gameObject;
 
                 eventData.pointerDrag = scrollGO;
                 ExecuteEvents.ExecuteHierarchy(scrollGO, eventData, ExecuteEvents.beginDragHandler);
                 draggedBlock = null;
-            }
-            else
-            {
-                Vector3 touchWorldPos = eventData.pointerCurrentRaycast.worldPosition;
-                Vector3 blockWorldPos = draggedBlock.transform.position;
-                touchOffset = blockWorldPos - touchWorldPos;
             }
         }
     }
@@ -75,6 +72,9 @@ public class DragController : MonoBehaviour
 
     private void OnBlockEndDrag(PointerEventData eventData)
     {
+        if (draggedBlock == null)
+            return;
+
         if (draggedBlock.inScroll)
         {
             // Если блок отпустили не вытащив из скролл панели, то возвращаем его на свое место
@@ -82,12 +82,22 @@ public class DragController : MonoBehaviour
         }
         else
         {
-            // Если блок отпустили на поле, то он начинает падение.
-            // Блок уничтожится, когда достигнет Y позиции немного выше скролл панели =
-            // верхняя граница скролл панели + еще 25% от ее высоты.
-            float scrollSizeY = scrollPanel.WorldBounds.size.y;
-            float yPositionToDestroyBlock = scrollPanel.WorldBounds.max.y + scrollSizeY * 0.25f;
-            draggedBlock.DoFall(yPositionToDestroyBlock);
+            Vector3 blockScreenPosition =
+                Camera.main.WorldToScreenPoint(draggedBlock.transform.position);
+
+            bool isBlockInLeftScreenArea = blockScreenPosition.x < Screen.width / 2f;
+
+            if (!GameManager.Instance.hasInstalledBlocks && !isBlockInLeftScreenArea)
+            {
+                draggedBlock.Install(false);
+            }
+            else
+            {
+                // Если блок отпустили на поле, то он начинает падение.
+                // Блок уничтожится, если достигнет верхней границы скролл панели
+                float destroyPosY = scrollPanel.WorldBounds.max.y;
+                draggedBlock.DoFall(destroyPosY);
+            }
         }
             
         draggedBlock = null;

@@ -3,16 +3,19 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class Block : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class Cube : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private BoxCollider2D boxCollider;
 
     private AsyncOperationHandle<Sprite> _texHandle;
+
     private bool isFall;
     private float fallSpeed;
 
     public BlockColor color { get; private set; } = BlockColor.None;
     public bool inScroll { get; private set; } = false;
+    public Bounds bounds => boxCollider.bounds;
     
     private void OnDestroy()
     {
@@ -40,7 +43,8 @@ public class Block : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         if (isFall)
             return;
 
-        GameManager.Instance.events.onBlockBeginDrag?.Invoke(eventData);
+        spriteRenderer.sortingOrder = 1;
+        GameManager.Instance.events.onBlockBeginDrag?.Invoke(this, eventData);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -67,32 +71,87 @@ public class Block : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         GameManager.Instance.events.onBlockDragOutFromScroll?.Invoke(this);
     }
 
-    public void DoFall(float targetPositionY)
+    public void DoFall(float destroyPosY, float delay = 0f)
     {
         isFall = true;
 
-        float distance = Mathf.Abs(transform.position.y - targetPositionY);
-        float tweenTime = distance / fallSpeed;
+        float towerHeight = GameManager.Instance.GetTowerHeight();
+        float fallDistance = Mathf.Abs(bounds.min.y - destroyPosY);
+        float targetPosY = destroyPosY;
+        bool hasBlockBelow = HasBlockBelow(out float distanceToBlock);
+        bool canInstall = false;
 
+        if (towerHeight < bounds.min.y && hasBlockBelow)
+        {
+            fallDistance = distanceToBlock;
+            targetPosY = transform.position.y - distanceToBlock;
+            canInstall = true;
+        }
+
+        float tweenTime = fallDistance / fallSpeed;
+        
         transform.DOKill();
 
         transform
-            .DOMoveY(targetPositionY, tweenTime)
+            .DOMoveY(targetPosY, tweenTime)
             .SetEase(Ease.InCubic)
-            .OnComplete(DestroyBlock);
+            .SetDelay(delay)
+            .OnComplete(() =>
+            {
+                if (canInstall)
+                    Install(true);
+                else
+                    DestroyBlock();
+            });
     }
 
-    private void Install()
+    private void StopFall()
     {
         isFall = false;
-
-        transform.DOKill();
+        transform.DOKill(true);
     }
 
-    private void DestroyBlock()
+    public void Install(bool withJump)
+    {
+        StopFall();
+
+        if (withJump)
+            DoJump();
+
+        spriteRenderer.sortingOrder = 0;
+        GameManager.Instance.events.onBlockInstall?.Invoke(this);
+    }
+
+    private void DoJump()
+    {
+        //Vector3 targetPos = transform.position += new Vector3(0, .5f, 0);
+
+        transform.DOKill();
+        transform.DOJump(transform.position, 0.25f, 1, 0.25f);
+    }
+
+    private bool HasBlockBelow(out float distanceToBlock)
+    {
+        distanceToBlock = 0f;
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
+        
+        if (!hit || hit.collider.tag != Constants.TAG_BLOCK)
+            return false;
+
+        if (!hit.collider.TryGetComponent(out Cube belowBlock))
+            return false;
+
+        if (belowBlock.inScroll)
+            return false;
+
+        distanceToBlock = Mathf.Abs(hit.point.y - bounds.min.y);
+        return true;
+    }
+
+    public void DestroyBlock()
     {
         SplashSpawner.Instance.Spawn(color, transform.position);
-        GameManager.Instance.events.onBlockDestroyed?.Invoke(this);
+        GameManager.Instance.events.onBlockDestroy?.Invoke(this);
         
         Destroy(gameObject);
     }
