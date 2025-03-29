@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class Cube : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class Block : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private BoxCollider2D boxCollider;
@@ -71,29 +73,49 @@ public class Cube : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         GameManager.Instance.events.onBlockDragOutFromScroll?.Invoke(this);
     }
 
-    public void DoFall(float destroyPosY, float delay = 0f)
+    public void DoFall(float distanceY = float.Epsilon, float delay = 0f)
     {
         isFall = true;
 
-        float towerHeight = GameManager.Instance.GetTowerHeight();
-        float fallDistance = Mathf.Abs(bounds.min.y - destroyPosY);
-        float targetPosY = destroyPosY;
-        bool hasBlockBelow = HasBlockBelow(out float distanceToBlock);
         bool canInstall = false;
+        float targetY = 0f;
+        float fallDistance = 0f;
+        
+        bool needCalculateDistance = distanceY == float.Epsilon;
+        
+        float destroyPosY =
+            GameManager.Instance.ScrollPanel.WorldBounds.max.y + bounds.size.y / 2f;
 
-        if (towerHeight < bounds.min.y && hasBlockBelow)
+        if (needCalculateDistance)
         {
-            fallDistance = distanceToBlock;
-            targetPosY = transform.position.y - distanceToBlock;
-            canInstall = true;
-        }
+            bool hasBlockBelow = HasBlockBelow(out float distanceToBlock);
 
+            canInstall = IsBlockAboveTower() && hasBlockBelow;
+
+            targetY = canInstall
+                ? transform.position.y - distanceToBlock
+                : destroyPosY;
+
+            fallDistance = canInstall
+                ? distanceToBlock
+                : Mathf.Abs(bounds.min.y - destroyPosY);
+        }
+        else
+        {
+            targetY = transform.position.y - distanceY;
+            canInstall = targetY > destroyPosY;
+
+            if (!canInstall)
+                targetY = destroyPosY;
+            
+            fallDistance = Mathf.Abs(bounds.min.y - targetY);
+        }
+        
         float tweenTime = fallDistance / fallSpeed;
         
         transform.DOKill();
-
         transform
-            .DOMoveY(targetPosY, tweenTime)
+            .DOMoveY(targetY, tweenTime)
             .SetEase(Ease.InCubic)
             .SetDelay(delay)
             .OnComplete(() =>
@@ -124,28 +146,50 @@ public class Cube : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
 
     private void DoJump()
     {
-        //Vector3 targetPos = transform.position += new Vector3(0, .5f, 0);
-
         transform.DOKill();
         transform.DOJump(transform.position, 0.25f, 1, 0.25f);
     }
 
-    private bool HasBlockBelow(out float distanceToBlock)
+    public bool IsBlockAboveTower()
+    {
+        float towerHeight = GameManager.Instance.GetTowerHeight();
+        return towerHeight < bounds.min.y;
+    }
+
+    public bool HasBlockBelow(out float distanceToBlock, int ignoreCount = 0)
     {
         distanceToBlock = 0f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
-        
-        if (!hit || hit.collider.tag != Constants.TAG_BLOCK)
+
+        List<RaycastHit2D> allHits =
+            Physics2D.RaycastAll(transform.position, Vector2.down).ToList();
+
+        if (allHits == null || allHits.Count == 0)
             return false;
 
-        if (!hit.collider.TryGetComponent(out Cube belowBlock))
+        List<RaycastHit2D> blocksHits =
+            allHits.FindAll(h => h.collider.tag == Constants.TAG_BLOCK); 
+
+        if (blocksHits == null || blocksHits.Count == 0)
             return false;
 
-        if (belowBlock.inScroll)
-            return false;
+        for (int i = 0; i < blocksHits.Count; i++) 
+        {
+            if (i < ignoreCount)
+                continue;
 
-        distanceToBlock = Mathf.Abs(hit.point.y - bounds.min.y);
-        return true;
+            var hit = blocksHits[i];
+
+            if (!hit.collider.TryGetComponent(out Block belowBlock))
+                continue;
+
+            if (belowBlock.inScroll)
+                continue;
+
+            distanceToBlock = Mathf.Abs(hit.point.y - bounds.min.y);
+            return true;
+        }
+
+        return false;
     }
 
     public void DestroyBlock()

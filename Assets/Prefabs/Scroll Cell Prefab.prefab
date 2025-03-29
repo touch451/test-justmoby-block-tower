@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8469228341186738888}
-  - component: {fileID: 8207119527458817603}
+  - component: {fileID: 6344525991566245063}
   m_Layer: 5
   m_Name: Scroll Cell Prefab
   m_TagString: Untagged
@@ -36,7 +36,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 180, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &8207119527458817603
+--- !u!114 &6344525991566245063
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,6 +45,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 5433456925514975479}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b1c3b9b2f9c4e02b40fe76164913ca, type: 3}
+  m_Script: {fileID: 11500000, guid: 91d7e0c8ea8774ee39c8632ac483302e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

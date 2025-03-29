@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3632131544791126623}
-  - component: {fileID: 5475482657559368690}
+  - component: {fileID: 6651720515252405100}
   - component: {fileID: 5593218524371200621}
   - component: {fileID: 3560100712759669912}
   m_Layer: 0
-  m_Name: Cube Prefab
+  m_Name: Block Prefab
   m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +34,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5475482657559368690
+--- !u!114 &6651720515252405100
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1645904968805216459}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2537963bef90483eb6ae42cd01cab08, type: 3}
+  m_Script: {fileID: 11500000, guid: 3c5f1cccbd5e64c3f9ab62ce52c8a61c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 5593218524371200621}

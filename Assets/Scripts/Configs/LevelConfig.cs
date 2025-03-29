@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelConfig : ScriptableObject
 {
     [SerializeField] [Range(1.0f, 20.0f)] private float fallSpeed = 10f;
+    [SerializeField] private int blocksCount = 20;
 
     [Header("Used colors:")]
     [SerializeField] private List<BlockColor> colors = new List<BlockColor>
@@ -33,4 +34,5 @@ public class LevelConfig : ScriptableObject
 
     public List<BlockColor> Colors => colors;
     public float FallSpeed => fallSpeed;
+    public int BlocksCount => blocksCount;
 }

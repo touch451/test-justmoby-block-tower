@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,7 +7,7 @@ public class DragController : MonoBehaviour
     [SerializeField] private ScrollPanel scrollPanel;
 
     private Vector2 touchOffset = Vector2.zero;
-    private Cube draggedBlock = null;
+    private Block draggedBlock = null;
 
     private void Start()
     {
@@ -21,7 +21,7 @@ public class DragController : MonoBehaviour
         GameManager.Instance.events.onBlockDrag.AddListener(OnBlockDrag);
     }
 
-    private void OnBlockBeginDrag(Cube block, PointerEventData eventData)
+    private void OnBlockBeginDrag(Block block, PointerEventData eventData)
     {
         if (draggedBlock != null)
             return;
@@ -86,17 +86,17 @@ public class DragController : MonoBehaviour
                 Camera.main.WorldToScreenPoint(draggedBlock.transform.position);
 
             bool isBlockInLeftScreenArea = blockScreenPosition.x < Screen.width / 2f;
+            bool hasInstalledBlocks = GameManager.Instance.blocksOrder.hasInstalledBlocks;
 
-            if (!GameManager.Instance.hasInstalledBlocks && !isBlockInLeftScreenArea)
+            if (!hasInstalledBlocks && !isBlockInLeftScreenArea)
             {
+                // Если это самый первый блок, то сразу его устанавливаем.
                 draggedBlock.Install(false);
             }
             else
             {
-                // Если блок отпустили на поле, то он начинает падение.
-                // Блок уничтожится, если достигнет верхней границы скролл панели
-                float destroyPosY = scrollPanel.WorldBounds.max.y;
-                draggedBlock.DoFall(destroyPosY);
+                // Если это не первый блок, то он начинает падать.
+                draggedBlock.DoFall();
             }
         }
             

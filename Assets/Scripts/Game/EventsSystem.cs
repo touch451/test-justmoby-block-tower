@@ -5,13 +5,13 @@ public class EventsSystem
 {
     #region Block Events
 
-    public UnityEvent<Cube, PointerEventData> onBlockBeginDrag = new UnityEvent<Cube, PointerEventData>();
+    public UnityEvent<Block, PointerEventData> onBlockBeginDrag = new UnityEvent<Block, PointerEventData>();
     public UnityEvent<PointerEventData> onBlockEndDrag = new UnityEvent<PointerEventData>();
     public UnityEvent<PointerEventData> onBlockDrag = new UnityEvent<PointerEventData>();
 
-    public UnityEvent<Cube> onBlockDragOutFromScroll = new UnityEvent<Cube>();
-    public UnityEvent<Cube> onBlockDestroy = new UnityEvent<Cube>();
-    public UnityEvent<Cube> onBlockInstall = new UnityEvent<Cube>();
+    public UnityEvent<Block> onBlockDragOutFromScroll = new UnityEvent<Block>();
+    public UnityEvent<Block> onBlockDestroy = new UnityEvent<Block>();
+    public UnityEvent<Block> onBlockInstall = new UnityEvent<Block>();
 
     #endregion
 

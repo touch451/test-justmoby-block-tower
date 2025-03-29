@@ -1,19 +1,20 @@
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private LevelConfig levelConfig;
     [SerializeField] private ScrollPanel scrollPanel;
-
-    private List<Cube> orderInstalledBlocks = new List<Cube>();
-
+    [SerializeField] private GameManager finishScreen;
+    
     public static GameManager Instance { get; private set; }
     public EventsSystem events = new EventsSystem();
+    public BlocksOrderSystem blocksOrder = new BlocksOrderSystem();
     public LevelConfig config => levelConfig;
-    public bool hasInstalledBlocks => orderInstalledBlocks.Count > 0;
-    
+    public ScrollPanel ScrollPanel => scrollPanel;
+
+    private float finishTowerHeight;
+
     private void Awake()
     {
         SetInstance();
@@ -22,7 +23,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        scrollPanel.SetBlocks(levelConfig.Colors);
+        CalculateFinishHeight();
+        scrollPanel.SetBlocks(config.BlocksCount, config.Colors);
     }
 
     private void OnDestroy()
@@ -45,27 +47,79 @@ public class GameManager : MonoBehaviour
     private void SetListeners()
     {
         events.onBlockInstall.AddListener(OnBlockInstall);
+        events.onBlockDestroy.AddListener(OnBlockDestroy);
         events.onBlockBeginDrag.AddListener(OnBlockBeginDrag);
     }
 
-    private void OnBlockBeginDrag(Cube draggedBlock, PointerEventData eventData)
+    private void OnBlockBeginDrag(Block draggedBlock, PointerEventData eventData)
     {
-        orderInstalledBlocks.Remove(draggedBlock);
+        if (!blocksOrder.ContainsBlock(draggedBlock))
+            return;
+
+        var upperBlocks = blocksOrder.GetUpperBlocks(draggedBlock);
+        blocksOrder.RemoveBlock(draggedBlock);
+        if (upperBlocks.Count == 0)
+        {
+            //blocksOrder.RemoveBlock(draggedBlock);
+            return;
+        }
+
+        bool hasBlockBelow =
+            upperBlocks[0].HasBlockBelow(out float distanceToBlock, 1);
+
+        for (int i = 0; i < upperBlocks.Count; i++)
+        {
+            var block = upperBlocks[i];
+
+            float fallDistance = hasBlockBelow ? distanceToBlock : 100f;
+            float delay = (i + 1) * 0.1f;
+
+            block.DoFall(fallDistance, delay);
+            blocksOrder.RemoveBlock(block);
+        }
     }
 
-    private void OnBlockInstall(Cube installedBlock)
+    private void OnBlockDestroy(Block destroyededBlock)
     {
-        orderInstalledBlocks.Add(installedBlock);
+        blocksOrder.RemoveBlock(destroyededBlock);
+    }
+
+    private void OnBlockInstall(Block installedBlock)
+    {
+        blocksOrder.AddBlock(installedBlock);
+
+        if (IsFinish())
+        {
+            ShowFinishScreen();
+        }
+    }
+
+    private bool IsFinish()
+    {
+        return GetTowerHeight() >= finishTowerHeight;
+    }
+
+    private void ShowFinishScreen()
+    {
+        // Show finish screen
+    }
+
+    private void CalculateFinishHeight()
+    {
+        var cam = Camera.main;
+
+        finishTowerHeight =
+            cam.ViewportToWorldPoint(new Vector3(1, 1, cam.nearClipPlane)).y;
     }
 
     public float GetTowerHeight()
     {
-        float height = -100;
+        float height = -100f;
 
-        if (hasInstalledBlocks)
+        if (blocksOrder.hasInstalledBlocks)
         {
-            var lastBlock = orderInstalledBlocks[orderInstalledBlocks.Count - 1];
-            height = lastBlock.bounds.max.y;
+            var upperBlock = blocksOrder.GetUpperBlock();
+            height = upperBlock.bounds.max.y;
         }
             
         return height;

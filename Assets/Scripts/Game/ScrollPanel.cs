@@ -26,16 +26,23 @@ public class ScrollPanel : MonoBehaviour
             ScriptTools.GetRectWorldOffsetMax(rect));
     }
 
-    public void SetBlocks(List<BlockColor> colors)
+    public void SetBlocks(int count, List<BlockColor> colors)
     {
-        for (int i = 0; i < colors.Count; i++)
+        int colorIndex = 0;
+
+        for (int i = 0; i < count; i++)
         {
-            var blockColor = colors[i];
+            if (colorIndex >= colors.Count)
+                colorIndex = 0;
+
+            var blockColor = colors[colorIndex];
             var cell = Instantiate(cellPrefab, scroll.content);
 
-            cell.name += "_" + i; 
+            cell.name += "_" + i;
             cell.SetBlock(blockColor);
             cells.Add(cell);
+
+            colorIndex++;
         }
     }
 }
